@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Aki’s Visual Rubik’s Cube – Linked Paint & Orientation</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root { --bg:#0b0c10; --card:#14161c; --ink:#f2f4f8; --muted:#9aa2b2; --border:#222633; --accent:#58a6ff; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans"; }
+  .wrap { max-width:1200px; margin:0 auto; padding:18px; display:grid; gap:14px; }
+  .panel { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; }
+  h1 { margin:0 0 8px; font-size:18px; letter-spacing:.2px; }
+  .grid { display:grid; gap:12px; }
+  .faces { grid-template-columns:repeat(3, minmax(180px, 1fr)); }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .hint { color:var(--muted); font-size:12px; }
+  .face { padding:10px; border:1px solid var(--border); border-radius:12px; position:relative; }
+  .face h3 { margin:0 0 8px; font-size:14px; color:var(--muted); display:flex; justify-content:space-between; align-items:center;}
+  .grid3 { display:grid; grid-template-columns:repeat(3, 40px); gap:6px; justify-content:center; }
+  .cell { width:40px; height:40px; border-radius:6px; border:1px solid #0006; cursor:pointer; position:relative; }
+  .cell .lbl { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; color:#000a; mix-blend-mode:soft-light; }
+  .cell .ori { position:absolute; left:4px; top:2px; font-size:10px; color:#000c; background:#fff6; padding:0 3px; border-radius:4px; display:none; }
+  .swatches { display:flex; gap:8px; flex-wrap:wrap; }
+  .sw { width:28px; height:28px; border-radius:8px; border:2px solid #0007; cursor:pointer; box-shadow:0 0 0 2px transparent; }
+  .sw.active { box-shadow:0 0 0 2px var(--accent); }
+  .btn { appearance:none; border:1px solid var(--border); background:#0f1117; color:var(--ink); padding:8px 12px; border-radius:10px; cursor:pointer; }
+  .btn:hover { border-color:#3a4152; transform:translateY(-1px); transition:all .12s ease; }
+  .btn.primary { background:var(--accent); color:#071320; border-color:transparent; font-weight:600; }
+  input[type="text"], textarea {
+    width:100%; background:#0f1117; color:var(--ink); border:1px solid var(--border);
+    border-radius:10px; padding:8px 10px;
+  }
+  #cube-container { width:100%; height:520px; background:#000; border-radius:12px; overflow:hidden; position:relative; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; color:var(--muted); font-size:12px; }
+  .chip { padding:3px 8px; border-radius:999px; border:1px solid var(--border); background:#0f1117; }
+  .face-tools { display:flex; gap:8px; }
+  .toggles { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .compass { position:absolute; right:10px; bottom:10px; background:#0f1117cc; color:#cbd3e1; border:1px solid var(--border); border-radius:10px; padding:6px 8px; display:none; }
+  .compass b { color:#fff; }
+  .net { display:none; gap:6px; align-items:center; }
+  .net .box { width:22px; height:22px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; border-radius:6px; background:#0f1117; }
+  .net .arrow { font-size:14px; color:#8aa2c0; }
+</style>
+<script src="https://cdn.jsdelivr.net/gh/cubing/AnimCubeJS/AnimCube3.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <h1>Visual Rubik’s Cube – Linked Paint & Orientation</h1>
+    <div class="chips">
+      <span class="chip">Pick a color → click stickers</span>
+      <span class="chip">Right-click = cycle</span>
+      <span class="chip">Faces: U, D, F, B, L, R</span>
+      <span class="chip">Colors: <b>W Y G B O R</b></span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="panel">
+    <div class="row toggles">
+      <div class="swatches" id="swatches"></div>
+      <button class="btn" id="toggleLetters">Sticker Letters</button>
+      <label><input type="checkbox" id="linkPaint" /> Face-linked paint (use center color)</label>
+      <label><input type="checkbox" id="showOrientation" /> Show orientation guides</label>
+      <div class="net" id="net">
+        <div class="box">U</div><div class="arrow">⬇</div><div class="box">F</div>
+        <div class="arrow"> ⬅ </div><div class="box">L</div>
+        <div class="arrow"> ➡ </div><div class="box">R</div>
+        <div class="arrow"> ⬆ </div><div class="box">D</div>
+        <div class="arrow"> ⤾ </div><div class="box">B</div>
+      </div>
+    </div>
+    <p class="hint">Face-linked paint ON → clicking on any face ignores palette and paints with that face’s center color.</p>
+  </div>
+
+  <!-- Faces -->
+  <div class="panel grid faces" id="faces"></div>
+
+  <!-- Global actions -->
+  <div class="panel">
+    <div class="row">
+      <button class="btn primary" id="saveStart">Save as Start</button>
+      <button class="btn" id="resetStart">Reset to Start</button>
+      <button class="btn" id="copyURL">Copy shareable URL</button>
+      <button class="btn" id="clearStart">Clear saved Start</button>
+    </div>
+    <p class="hint">Start is saved locally (<code>rubik.start.facelets</code>) and can be encoded in the URL.</p>
+  </div>
+
+  <!-- Moves -->
+  <div class="panel">
+    <label>Try a move sequence (e.g. <code>R U R' U'</code>):</label>
+    <div class="row" style="margin-top:6px;">
+      <input id="moves" type="text" placeholder="Enter moves…" />
+      <button class="btn primary" id="applyMoves">Apply Moves</button>
+      <button class="btn" id="retry">Reset to Start (retry)</button>
+    </div>
+  </div>
+
+  <!-- Import / Export -->
+  <div class="panel">
+    <div class="grid" style="grid-template-columns:1fr 1fr;">
+      <div>
+        <label>Export (54-char facelets: U D F B L R)</label>
+        <textarea id="faceletsOut" readonly></textarea>
+        <div class="row" style="margin-top:6px;">
+          <button class="btn" id="refreshOut">Refresh</button>
+          <button class="btn" id="copyOut">Copy</button>
+        </div>
+      </div>
+      <div>
+        <label>Import 54-char</label>
+        <textarea id="faceletsIn" placeholder="wygbor letters only, 54 chars"></textarea>
+        <div class="row" style="margin-top:6px;">
+          <button class="btn" id="importIn">Import</button>
+          <button class="btn" id="fillCenters">Fill each face from center color</button>
+        </div>
+        <p class="hint">Tip: set each face center, then “Fill each face…”.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cube -->
+  <div class="panel" style="padding:0; overflow:hidden; position:relative;">
+    <div id="cube-container"></div>
+    <div class="compass" id="compass">Axis: <b>U</b> up • <b>F</b> front • <b>R</b> right</div>
+  </div>
+</div>
+
+<script>
+/* ===== Model & helpers ===== */
+const FACE_ORDER = ["U","D","F","B","L","R"]; // U D F B L R order for 54-string
+const COLORS = [
+  {k:"w", name:"White",  c:"#ffffff"},
+  {k:"y", name:"Yellow", c:"#ffd600"},
+  {k:"g", name:"Green",  c:"#00a651"},
+  {k:"b", name:"Blue",   c:"#1e88e5"},
+  {k:"o", name:"Orange", c:"#ff7a00"},
+  {k:"r", name:"Red",    c:"#e53935"},
+];
+const START_KEY = "rubik.start.facelets";
+
+let showLetters = false;
+let activeColor = "w";
+let linkPaint = false;
+let showOrientationGuides = false;
+
+// state: each face is array of 9 letters
+const state = {};
+FACE_ORDER.forEach(f => state[f] = Array(9).fill(defaultForFace(f)));
+
+function defaultForFace(f) {
+  return {U:"w",D:"y",F:"g",B:"b",L:"o",R:"r"}[f];
+}
+
+function stringifyFacelets() {
+  return FACE_ORDER.map(f => state[f].join("")).join("");
+}
+function loadFrom54(s) {
+  const t = s.toLowerCase().replace(/\s+/g,"");
+  if(!/^[wygbor]{54}$/.test(t)) return false;
+  let i=0;
+  FACE_ORDER.forEach(f => {
+    state[f] = t.slice(i, i+9).split("");
+    i+=9;
+  });
+  return true;
+}
+function faceCenter(f) { return state[f][4]; }
+function colorOf(k) { return COLORS.find(x=>x.k===k)?.c || "#888"; }
+function nextColor(k) { const i = COLORS.findIndex(x=>x.k===k); return COLORS[(i+1)%COLORS.length].k; }
+
+/* ===== UI: swatches ===== */
+const swWrap = document.getElementById("swatches");
+COLORS.forEach(({k,name,c})=>{
+  const d = document.createElement("div");
+  d.className = "sw" + (k===activeColor?" active":"");
+  d.title = name + " ("+k.toUpperCase()+")";
+  d.style.background = c;
+  d.dataset.k = k;
+  d.onclick = () => {
+    activeColor = k;
+    document.querySelectorAll(".sw").forEach(x=>x.classList.remove("active"));
+    d.classList.add("active");
+  };
+  swWrap.appendChild(d);
+});
+
+/* ===== UI: faces with orientation labels ===== */
+const facesWrap = document.getElementById("faces");
+
+// map index -> sublabel per face to help orientation (row-major 0..8)
+const idxLabel = ["1","2","3","4","5","6","7","8","9"]; // simple
+// corner/edge hint sets (positions on a face)
+const cornerIdx = new Set([0,2,6,8]);
+const edgeIdx   = new Set([1,3,5,7]);
+
+FACE_ORDER.forEach(f=>{
+  const card = document.createElement("div");
+  card.className = "face";
+  const h = document.createElement("h3");
+  h.innerHTML = `<span>${f}</span>
+    <span class="face-tools">
+      <button class="btn" data-action="fill">Fill face</button>
+      <button class="btn" data-action="clear">Clear</button>
+    </span>`;
+  const grid = document.createElement("div");
+  grid.className = "grid3";
+
+  function paint(i, k) {
+    state[f][i] = k;
+    const el = grid.children[i];
+    el.style.background = colorOf(k);
+    el.querySelector(".lbl").textContent = showLetters ? k.toUpperCase() : "";
+    const ori = el.querySelector(".ori");
+    if(showOrientationGuides){
+      ori.style.display = "inline-block";
+    } else {
+      ori.style.display = "none";
+    }
+    refreshExportBox();
+  }
+
+  for(let i=0;i<9;i++){
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.style.background = colorOf(state[f][i]);
+
+    const lbl = document.createElement("div");
+    lbl.className = "lbl";
+    lbl.textContent = ""; // letters off by default
+    cell.appendChild(lbl);
+
+    const ori = document.createElement("div");
+    ori.className = "ori";
+    // show a light hint: C/E/Co + index
+    ori.textContent = cornerIdx.has(i) ? ("Co"+idxLabel[i]) : edgeIdx.has(i) ? ("E"+idxLabel[i]) : ("C"+idxLabel[i]); // center is C5
+    cell.appendChild(ori);
+
+    cell.dataset.idx = i;
+    cell.addEventListener("click", e=>{
+      const k = linkPaint ? faceCenter(f) : activeColor;
+      paint(i, k);
+    });
+    cell.addEventListener("contextmenu", e=>{
+      e.preventDefault();
+      const k = nextColor(state[f][i]);
+      paint(i, k);
+    });
+    grid.appendChild(cell);
+  }
+
+  h.querySelector('[data-action="fill"]').onclick = ()=>{
+    const k = faceCenter(f);
+    for(let i=0;i<9;i++) paint(i,k);
+  };
+  h.querySelector('[data-action="clear"]').onclick = ()=>{
+    for(let i=0;i<9;i++) paint(i, defaultForFace(f));
+  };
+
+  card.appendChild(h);
+  card.appendChild(grid);
+  facesWrap.appendChild(card);
+});
+
+/* ===== Toggles ===== */
+document.getElementById("toggleLetters").onclick = ()=>{
+  showLetters = !showLetters;
+  document.querySelectorAll(".cell .lbl").forEach((lbl, idx)=>{
+    const cell = lbl.parentElement;
+    const f = cell.closest(".face").querySelector("h3 span").textContent.trim();
+    const i = +cell.dataset.idx;
+    lbl.textContent = showLetters ? state[f][i].toUpperCase() : "";
+  });
+};
+document.getElementById("linkPaint").onchange = (e)=>{ linkPaint = e.target.checked; };
+document.getElementById("showOrientation").onchange = (e)=>{
+  showOrientationGuides = e.target.checked;
+  // show/hide mini net + compass + per-sticker ori labels
+  document.getElementById("net").style.display = showOrientationGuides ? "inline-grid" : "none";
+  document.getElementById("compass").style.display = showOrientationGuides ? "block" : "none";
+  document.querySelectorAll(".cell .ori").forEach(o=>{ o.style.display = showOrientationGuides ? "inline-block":"none"; });
+};
+
+/* ===== AnimCube integration ===== */
+let currentStart = "";
+function buildCube(facelets, initmove="") {
+  const outer = document.getElementById("cube-container");
+  outer.innerHTML = "";
+  const params = {
+    id: "cube-container",
+    buttonbar: 0,
+    borderwidth: 2,
+    scale: 3,
+    bgcolor: "000000",
+    hint: 10,
+    facelets
+  };
+  if (initmove) params.initmove = initmove.replace(/\s+/g,"");
+  AnimCube3(Object.entries(params).map(([k,v])=>`${k}=${v}`).join("&"));
+}
+
+/* ===== Export / Import ===== */
+const outTA = document.getElementById("faceletsOut");
+const inTA  = document.getElementById("faceletsIn");
+function refreshExportBox(){ outTA.value = stringifyFacelets().toUpperCase(); }
+document.getElementById("refreshOut").onclick = refreshExportBox;
+document.getElementById("copyOut").onclick = ()=>{ navigator.clipboard.writeText(outTA.value); };
+
+/* ===== Persistence & URL ===== */
+function saveStart(facelets){ localStorage.setItem(START_KEY, facelets); currentStart = facelets; }
+function loadSavedStart(){
+  const urlS = new URLSearchParams(location.search).get("s");
+  if(urlS && /^[wygbor]{54}$/.test(urlS)) return urlS;
+  const ls = localStorage.getItem(START_KEY);
+  if(ls && /^[wygbor]{54}$/.test(ls)) return ls;
+  return "";
+}
+function copyURLWithState(facelets){
+  const u = new URL(location.href);
+  u.searchParams.set("s", facelets);
+  navigator.clipboard.writeText(u.toString());
+  alert("URL copied!");
+}
+
+/* ===== Buttons ===== */
+document.getElementById("importIn").onclick = ()=>{
+  const s = inTA.value.trim().toLowerCase().replace(/\s+/g,"");
+  if(!/^[wygbor]{54}$/.test(s)) { alert("Need 54 letters (w,y,g,b,o,r)."); return; }
+  loadFrom54(s);
+  syncGridColors();
+  refreshExportBox();
+  buildCube(stringifyFacelets());
+};
+document.getElementById("fillCenters").onclick = ()=>{
+  FACE_ORDER.forEach(f=>{
+    const k = state[f][4];
+    for(let i=0;i<9;i++) state[f][i] = k;
+  });
+  syncGridColors();
+  refreshExportBox();
+};
+
+document.getElementById("saveStart").onclick = ()=>{
+  const s = stringifyFacelets();
+  saveStart(s);
+  buildCube(s);
+};
+document.getElementById("resetStart").onclick = ()=>{
+  if(!currentStart){ alert("No Start yet. Press “Save as Start” first."); return; }
+  loadFrom54(currentStart);
+  syncGridColors();
+  refreshExportBox();
+  buildCube(currentStart);
+};
+document.getElementById("retry").onclick = ()=>{
+  if(!currentStart){ alert("No Start yet."); return; }
+  buildCube(currentStart);
+};
+document.getElementById("copyURL").onclick = ()=>{
+  if(!currentStart){ alert("No Start yet."); return; }
+  copyURLWithState(currentStart);
+};
+document.getElementById("clearStart").onclick = ()=>{
+  localStorage.removeItem(START_KEY); currentStart = "";
+  alert("Saved Start cleared.");
+};
+
+document.getElementById("applyMoves").onclick = ()=>{
+  if(!currentStart){ alert("Press “Save as Start” first."); return; }
+  const moves = document.getElementById("moves").value;
+  buildCube(currentStart, moves);
+};
+
+/* ===== Sync helpers ===== */
+function syncGridColors(){
+  FACE_ORDER.forEach((f, fi)=>{
+    const faceEl = document.querySelectorAll(".face")[fi];
+    const cells = faceEl.querySelectorAll(".cell");
+    cells.forEach((c, i)=>{
+      c.style.background = colorOf(state[f][i]);
+      c.querySelector(".lbl").textContent = showLetters ? state[f][i].toUpperCase() : "";
+      const ori = c.querySelector(".ori");
+      ori.style.display = showOrientationGuides ? "inline-block" : "none";
+    });
+  });
+}
+
+/* ===== Boot ===== */
+(function init(){
+  const saved = loadSavedStart();
+  if(saved){ loadFrom54(saved); currentStart = saved; }
+  syncGridColors();
+  refreshExportBox();
+  buildCube(stringifyFacelets());
+})();
+</script>
+</body>
+</html>
