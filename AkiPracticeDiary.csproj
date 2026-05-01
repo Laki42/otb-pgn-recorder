@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <AssemblyName>AkiPracticeDiary</AssemblyName>
+    <RootNamespace>AkiPracticeDiary</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+    参照DLLのパスはローカル環境に合わせて変更してください。
+    ここでは Beat Saber 1.29.x + BSIPA を想定した最小構成です。
+  -->
+  <ItemGroup>
+    <Reference Include="IPA">
+      <HintPath>Libs/IPA.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>Libs/UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="HMUI">
+      <HintPath>Libs/HMUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Main">
+      <HintPath>Libs/Main.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BS_Utils">
+      <HintPath>Libs/BS_Utils.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>
