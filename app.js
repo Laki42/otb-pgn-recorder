@@ -79,6 +79,27 @@ function escapePgnValue(value) {
   return String(value || '?').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
+function resultText() {
+  if (chess.isCheckmate()) return chess.turn() === 'w' ? '0-1' : '1-0';
+  if (chess.isDraw()) return '1/2-1/2';
+  return '*';
+}
+
+function moveText() {
+  const history = chess.history();
+  if (history.length === 0) return '';
+
+  const turns = [];
+  for (let i = 0; i < history.length; i += 2) {
+    const number = (i / 2) + 1;
+    const white = history[i] || '';
+    const black = history[i + 1] ? ` ${history[i + 1]}` : '';
+    turns.push(`${number}. ${white}${black}`);
+  }
+
+  return `${turns.join(' ')} ${resultText()}`;
+}
+
 function pgnWithMetadata() {
   const metadata = readMetadata();
   const opponent = metadata.opponent || '?';
@@ -91,7 +112,7 @@ function pgnWithMetadata() {
     ['Black', black]
   ];
   const headerText = headers.map(([key, value]) => `[${key} "${escapePgnValue(value)}"]`).join('\n');
-  const moves = chess.pgn().trim();
+  const moves = moveText();
 
   return moves ? `${headerText}\n\n${moves}` : `${headerText}\n`;
 }
