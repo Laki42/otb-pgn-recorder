@@ -3,12 +3,14 @@ import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm';
 const GAME_KEY = 'otb_chess_scoresheet_state_v1';
 const ORIENT_KEY = 'otb_chess_scoresheet_orientation_v1';
 const META_KEY = 'otb_chess_scoresheet_metadata_v1';
+const RESULT_KEY = 'otb_chess_scoresheet_result_v1';
 const PLAYER_NAME = 'Aki';
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 const PIECES = {
   wp: '♙', wn: '♘', wb: '♗', wr: '♖', wq: '♕', wk: '♔',
   bp: '♟', bn: '♞', bb: '♝', br: '♜', bq: '♛', bk: '♚'
 };
+const RESULTS = ['*', '1-0', '0-1', '1/2-1/2'];
 
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
@@ -23,6 +25,11 @@ const myColorInput = document.getElementById('myColorInput');
 const opponentInput = document.getElementById('opponentInput');
 const roundInput = document.getElementById('roundInput');
 const dateInput = document.getElementById('dateInput');
+const resultInput = document.getElementById('resultInput');
+const resultStatusEl = document.getElementById('resultStatus');
+const whiteResignsBtn = document.getElementById('whiteResignsBtn');
+const blackResignsBtn = document.getElementById('blackResignsBtn');
+const drawResultBtn = document.getElementById('drawResultBtn');
 
 let chess = new Chess();
 let selectedSquare = null;
@@ -72,6 +79,30 @@ function restoreMetadata() {
   dateInput.value = metadata.date || todayDateValue();
 }
 
+function readResult() {
+  return RESULTS.includes(resultInput.value) ? resultInput.value : '*';
+}
+
+function renderResult() {
+  resultStatusEl.textContent = `Current result: ${readResult()}`;
+}
+
+function saveResult() {
+  localStorage.setItem(RESULT_KEY, readResult());
+  renderResult();
+}
+
+function restoreResult() {
+  const saved = localStorage.getItem(RESULT_KEY);
+  resultInput.value = RESULTS.includes(saved) ? saved : '*';
+  renderResult();
+}
+
+function setResult(value) {
+  resultInput.value = RESULTS.includes(value) ? value : '*';
+  saveResult();
+}
+
 function formatPgnDate(value) {
   return (value || todayDateValue()).replaceAll('-', '.');
 }
@@ -81,9 +112,7 @@ function escapePgnValue(value) {
 }
 
 function resultText() {
-  if (chess.isCheckmate()) return chess.turn() === 'w' ? '0-1' : '1-0';
-  if (chess.isDraw()) return '1/2-1/2';
-  return '*';
+  return readResult();
 }
 
 function moveText() {
@@ -106,11 +135,13 @@ function pgnWithMetadata() {
   const opponent = metadata.opponent || '?';
   const white = metadata.myColor === 'white' ? PLAYER_NAME : opponent;
   const black = metadata.myColor === 'white' ? opponent : PLAYER_NAME;
+  const result = resultText();
   const headers = [
     ['Date', formatPgnDate(metadata.date)],
     ['Round', metadata.round],
     ['White', white],
-    ['Black', black]
+    ['Black', black],
+    ['Result', result]
   ];
   const headerText = headers.map(([key, value]) => `[${key} "${escapePgnValue(value)}"]`).join('\n');
   const moves = moveText();
@@ -265,6 +296,11 @@ function onSquareTap(e) {
   input.addEventListener('input', saveMetadata);
 });
 
+resultInput.addEventListener('change', saveResult);
+whiteResignsBtn.addEventListener('click', () => setResult('0-1'));
+blackResignsBtn.addEventListener('click', () => setResult('1-0'));
+drawResultBtn.addEventListener('click', () => setResult('1/2-1/2'));
+
 undoBtn.addEventListener('click', () => {
   chess.undo();
   selectedSquare = null;
@@ -289,6 +325,7 @@ flipBtn.addEventListener('click', () => {
 copyPgnBtn.addEventListener('click', async () => {
   const pgn = pgnWithMetadata();
   saveMetadata();
+  saveResult();
   try {
     await navigator.clipboard.writeText(pgn);
     statusEl.textContent = 'PGN copied.';
@@ -300,6 +337,7 @@ copyPgnBtn.addEventListener('click', async () => {
 copyLichessBtn.addEventListener('click', async () => {
   const pgn = pgnWithMetadata();
   saveMetadata();
+  saveResult();
   try {
     await navigator.clipboard.writeText(pgn);
     statusEl.textContent = 'PGN copied. Opening Lichess.';
@@ -312,6 +350,7 @@ copyLichessBtn.addEventListener('click', async () => {
 exportPgnBtn.addEventListener('click', () => {
   const pgn = pgnWithMetadata();
   saveMetadata();
+  saveResult();
   const blob = new Blob([pgn], { type: 'application/x-chess-pgn' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -324,5 +363,6 @@ exportPgnBtn.addEventListener('click', () => {
 });
 
 restoreMetadata();
+restoreResult();
 restoreState();
 drawBoard();
