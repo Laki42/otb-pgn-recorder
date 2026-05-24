@@ -17,6 +17,7 @@ const undoBtn = document.getElementById('undoBtn');
 const newGameBtn = document.getElementById('newGameBtn');
 const flipBtn = document.getElementById('flipBtn');
 const copyPgnBtn = document.getElementById('copyPgnBtn');
+const copyLichessBtn = document.getElementById('copyLichessBtn');
 const exportPgnBtn = document.getElementById('exportPgnBtn');
 const myColorInput = document.getElementById('myColorInput');
 const opponentInput = document.getElementById('opponentInput');
@@ -291,6 +292,18 @@ copyPgnBtn.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(pgn);
     statusEl.textContent = 'PGN copied.';
+  } catch (_error) {
+    statusEl.textContent = 'Clipboard not available in this browser context.';
+  }
+});
+
+copyLichessBtn.addEventListener('click', async () => {
+  const pgn = pgnWithMetadata();
+  saveMetadata();
+  try {
+    await navigator.clipboard.writeText(pgn);
+    statusEl.textContent = 'PGN copied. Opening Lichess.';
+    window.open('https://lichess.org/paste', '_blank', 'noopener');
   } catch (_error) {
     statusEl.textContent = 'Clipboard not available in this browser context.';
   }
