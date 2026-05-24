@@ -16,13 +16,14 @@ A mobile-friendly, no-backend web app for recording over-the-board chess games.
 ## Tech
 
 - Plain HTML/CSS/JavaScript.
-- `chess.js` loaded from CDN.
+- `chess.js` loaded as an ES module from jsDelivr.
+- Chess pieces are rendered with Unicode symbols, so no local image assets are required.
 - Static files only (GitHub Pages compatible).
 
 ## GitHub Pages deployment
 
 1. Push this repository to GitHub.
-2. In GitHub, open **Settings → Pages**.
+2. In GitHub, open **Settings -> Pages**.
 3. Under **Build and deployment**, choose:
    - **Source**: `Deploy from a branch`
    - **Branch**: your default branch (e.g. `main`) and `/ (root)`

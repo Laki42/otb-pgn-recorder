@@ -1,3 +1,5 @@
+import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm';
+
 const GAME_KEY = 'otb_chess_scoresheet_state_v1';
 const ORIENT_KEY = 'otb_chess_scoresheet_orientation_v1';
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -69,6 +71,7 @@ function drawBoard() {
       if (legal.includes(square)) button.classList.add('square--legal');
       button.dataset.square = square;
       button.type = 'button';
+      button.setAttribute('role', 'gridcell');
       button.setAttribute('aria-label', `Square ${square}${piece ? ` with ${piece.color}${piece.type}` : ''}`);
       button.textContent = piece ? PIECES[`${piece.color}${piece.type}`] : '';
       button.addEventListener('click', onSquareTap);
@@ -108,7 +111,7 @@ function renderStatus() {
   statusEl.textContent = `${chess.turn() === 'w' ? 'White' : 'Black'} to move${chess.inCheck() ? ' (check)' : ''}.`;
 }
 
-function choosePromotion(pieceColor) {
+function choosePromotion() {
   const choice = prompt('Promote to: q (Queen), r (Rook), b (Bishop), n (Knight)', 'q');
   if (!choice) return null;
   const pick = choice.trim().toLowerCase();
@@ -125,8 +128,7 @@ function performMove(from, to) {
   const needsPromotion = candidates.some((m) => m.promotion);
   if (!needsPromotion) return chess.move({ from, to });
 
-  const movingPiece = chess.get(from);
-  const pick = choosePromotion(movingPiece?.color || chess.turn());
+  const pick = choosePromotion();
   if (!pick) return null;
 
   return chess.move({ from, to, promotion: pick });
