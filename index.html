@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>OTB Chess Scoresheet</title>
-  <link rel="stylesheet" href="style.css?v=20260524-pages-board" />
+  <link rel="stylesheet" href="style.css?v=20260524-metadata" />
 </head>
 <body>
   <main class="app">
@@ -12,6 +12,28 @@
       <h1>OTB Chess Scoresheet</h1>
       <p>Tap source, then destination. Legal moves only.</p>
     </header>
+
+    <section class="metadata" aria-label="Game metadata">
+      <label class="field">
+        <span>My color</span>
+        <select id="myColorInput">
+          <option value="white">White</option>
+          <option value="black">Black</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Opponent</span>
+        <input id="opponentInput" type="text" autocomplete="off" placeholder="Opponent name" />
+      </label>
+      <label class="field">
+        <span>Round</span>
+        <input id="roundInput" type="number" min="1" step="1" inputmode="numeric" />
+      </label>
+      <label class="field">
+        <span>Date</span>
+        <input id="dateInput" type="date" />
+      </label>
+    </section>
 
     <section class="board-section" aria-label="Chessboard section">
       <div id="board" class="board" role="grid" aria-label="Chess board"></div>
@@ -32,6 +54,6 @@
     </section>
   </main>
 
-  <script type="module" src="app.js?v=20260524-pages-board"></script>
+  <script type="module" src="app.js?v=20260524-metadata"></script>
 </body>
 </html>
