@@ -29,6 +29,34 @@ body {
 .app__header h1 { margin: 0; font-size: 1.4rem; }
 .app__header p { margin: 6px 0 0; color: var(--muted); }
 
+.metadata {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.field {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: .85rem;
+  font-weight: 600;
+}
+.field input,
+.field select {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #202533;
+  color: var(--text);
+  padding: 8px 10px;
+  font: inherit;
+}
+
 .board-section {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -107,5 +135,5 @@ body {
     grid-template-columns: minmax(300px, 560px) 1fr;
     align-items: start;
   }
-  .app__header, .controls { grid-column: 1 / -1; }
+  .app__header, .metadata, .controls { grid-column: 1 / -1; }
 }
