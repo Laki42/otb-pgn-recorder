@@ -29,7 +29,8 @@ body {
 .app__header h1 { margin: 0; font-size: 1.4rem; }
 .app__header p { margin: 6px 0 0; color: var(--muted); }
 
-.metadata {
+.metadata,
+.result-panel {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -37,6 +38,17 @@ body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+.result-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.result-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  min-height: 1.25rem;
+  color: var(--muted);
 }
 .field {
   display: grid;
@@ -135,5 +147,5 @@ body {
     grid-template-columns: minmax(300px, 560px) 1fr;
     align-items: start;
   }
-  .app__header, .metadata, .controls { grid-column: 1 / -1; }
+  .app__header, .metadata, .result-panel, .controls { grid-column: 1 / -1; }
 }
