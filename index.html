@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>OTB Chess Scoresheet</title>
-  <link rel="stylesheet" href="style.css?v=20260524-metadata" />
+  <link rel="stylesheet" href="style.css?v=20260525-result" />
 </head>
 <body>
   <main class="app">
@@ -35,6 +35,24 @@
       </label>
     </section>
 
+    <section class="result-panel" aria-label="Game result">
+      <label class="field">
+        <span>Result</span>
+        <select id="resultInput">
+          <option value="*">Unfinished (*)</option>
+          <option value="1-0">White wins (1-0)</option>
+          <option value="0-1">Black wins (0-1)</option>
+          <option value="1/2-1/2">Draw (1/2-1/2)</option>
+        </select>
+      </label>
+      <div class="result-actions" aria-label="Quick result buttons">
+        <button id="whiteResignsBtn" class="btn" type="button">White resigns</button>
+        <button id="blackResignsBtn" class="btn" type="button">Black resigns</button>
+        <button id="drawResultBtn" class="btn" type="button">Draw</button>
+      </div>
+      <p id="resultStatus" class="result-status" aria-live="polite"></p>
+    </section>
+
     <section class="board-section" aria-label="Chessboard section">
       <div id="board" class="board" role="grid" aria-label="Chess board"></div>
       <p id="status" class="status" aria-live="polite"></p>
@@ -55,6 +73,6 @@
     </section>
   </main>
 
-  <script type="module" src="app.js?v=20260524-lichess"></script>
+  <script type="module" src="app.js?v=20260525-result"></script>
 </body>
 </html>
