@@ -2,77 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>OTB Chess Scoresheet</title>
-  <link rel="stylesheet" href="style.css?v=20260525-result" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hana Furu</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="app">
-    <header class="app__header">
-      <h1>OTB Chess Scoresheet</h1>
-      <p>Tap source, then destination. Legal moves only.</p>
+  <div class="petals" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <main class="page-shell">
+    <header class="site-header">
+      <p class="eyebrow">花降る</p>
+      <h1>Hana Furu</h1>
+      <p>A quiet flower oracle for small days.</p>
     </header>
 
-    <section class="metadata" aria-label="Game metadata">
-      <label class="field">
-        <span>My color</span>
-        <select id="myColorInput">
-          <option value="white">White</option>
-          <option value="black">Black</option>
-        </select>
-      </label>
-      <label class="field">
-        <span>Opponent</span>
-        <input id="opponentInput" type="text" autocomplete="off" placeholder="Opponent name" />
-      </label>
-      <label class="field">
-        <span>Round</span>
-        <input id="roundInput" type="number" min="1" step="1" inputmode="numeric" />
-      </label>
-      <label class="field">
-        <span>Date</span>
-        <input id="dateInput" type="date" />
-      </label>
-    </section>
+    <section class="oracle-card" aria-labelledby="oracle-title">
+      <div class="moon-mark" aria-hidden="true"></div>
+      <h2 id="oracle-title">Today’s flower has fallen.</h2>
+      <p class="intro">Choose the mood you brought to the garden, then let one flower drift down.</p>
 
-    <section class="result-panel" aria-label="Game result">
-      <label class="field">
-        <span>Result</span>
-        <select id="resultInput">
-          <option value="*">Unfinished (*)</option>
-          <option value="1-0">White wins (1-0)</option>
-          <option value="0-1">Black wins (0-1)</option>
-          <option value="1/2-1/2">Draw (1/2-1/2)</option>
+      <form class="mood-picker" aria-label="Choose your mood">
+        <label for="moodSelect">Mood</label>
+        <select id="moodSelect" name="mood">
+          <option value="Quiet">Quiet</option>
+          <option value="Tired">Tired</option>
+          <option value="Restless">Restless</option>
+          <option value="Hopeful">Hopeful</option>
+          <option value="Lonely">Lonely</option>
+          <option value="Annoyed">Annoyed</option>
         </select>
-      </label>
-      <div class="result-actions" aria-label="Quick result buttons">
-        <button id="whiteResignsBtn" class="btn" type="button">White resigns</button>
-        <button id="blackResignsBtn" class="btn" type="button">Black resigns</button>
-        <button id="drawResultBtn" class="btn" type="button">Draw</button>
+      </form>
+
+      <div class="actions" aria-label="Oracle actions">
+        <button id="drawButton" class="primary-button" type="button">Let a flower fall</button>
+        <button id="drawAgainButton" class="secondary-button" type="button">Draw again</button>
       </div>
-      <p id="resultStatus" class="result-status" aria-live="polite"></p>
+
+      <article id="resultCard" class="result-card hidden" aria-live="polite"></article>
     </section>
 
-    <section class="board-section" aria-label="Chessboard section">
-      <div id="board" class="board" role="grid" aria-label="Chess board"></div>
-      <p id="status" class="status" aria-live="polite"></p>
-    </section>
-
-    <section class="controls" aria-label="Game controls">
-      <button id="undoBtn" class="btn">Undo</button>
-      <button id="newGameBtn" class="btn btn--danger">New Game</button>
-      <button id="flipBtn" class="btn">Flip Board</button>
-      <button id="copyPgnBtn" class="btn">Copy PGN</button>
-      <button id="copyLichessBtn" class="btn">Copy PGN & Open Lichess</button>
-      <button id="exportPgnBtn" class="btn">Export .pgn</button>
-    </section>
-
-    <section class="moves" aria-label="Move list">
-      <h2>Moves</h2>
-      <ol id="moveList" class="move-list"></ol>
+    <section class="history-card" aria-labelledby="history-title">
+      <div class="history-heading">
+        <h2 id="history-title">Past Flowers</h2>
+        <button id="clearHistoryButton" class="text-button" type="button">Clear history</button>
+      </div>
+      <ul id="historyList" class="history-list"></ul>
     </section>
   </main>
 
-  <script type="module" src="app.js?v=20260525-result"></script>
+  <script src="script.js"></script>
 </body>
 </html>

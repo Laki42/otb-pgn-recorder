@@ -1,41 +1,46 @@
-# OTB Chess Scoresheet
+# Hana Furu
 
-A mobile-friendly, no-backend web app for recording over-the-board chess games.
+Hana Furu is a quiet daily flower oracle for small days. Open the app, choose a mood, and let one symbolic flower fall with a poetic message, short interpretation, small action, lucky item, and gentle warning.
 
-## Features
+## Repository
 
-- Tap-to-move chessboard (tap source square, then destination square).
-- Legal move validation with `chess.js`.
-- Automatic SAN move recording.
-- Promotion choice support (`q/r/b/n`) when a pawn promotes.
-- Undo, New Game (with confirmation), Copy PGN, Export `.pgn`.
-- Local storage persistence (reload-safe).
-- Board orientation toggle (white/black at bottom).
-- No engine analysis, no evaluations, no move suggestions.
+The intended GitHub repository for this project is <https://github.com/Laki42/Hana-Furu>. This static app can be copied or pushed there as the root contents of the Hana Furu repository.
 
-## Tech
+## How to open locally
 
-- Plain HTML/CSS/JavaScript.
-- `chess.js` loaded as an ES module from jsDelivr.
-- Chess pieces are rendered with Unicode symbols, so no local image assets are required.
-- Static files only (GitHub Pages compatible).
+Open `index.html` directly in any modern web browser. No server is required.
 
-## GitHub Pages deployment
+## What kind of app is this?
 
-1. Push this repository to GitHub.
-2. In GitHub, open **Settings -> Pages**.
-3. Under **Build and deployment**, choose:
-   - **Source**: `Deploy from a branch`
-   - **Branch**: your default branch (e.g. `main`) and `/ (root)`
-4. Save.
-5. Wait for deployment and open the provided Pages URL.
+This is a simple static web app made with only:
 
-## Local run
+- `index.html`
+- `style.css`
+- `script.js`
 
-You can open `index.html` directly, or run a static server, for example:
+There is no React, Vue, TypeScript, Tailwind, build step, backend, login, database, or external API.
 
-```bash
-python3 -m http.server 8000
-```
+## Editing the flower oracle entries
 
-Then open `http://localhost:8000`.
+The flower oracle entries live in the `flowerOracles` array near the top of `script.js`. Each entry has these fields:
+
+- `flowerName`
+- `omenType`
+- `message`
+- `meaning`
+- `smallAction`
+- `luckyItem`
+- `warning`
+
+Add, remove, or rewrite entries there to change the oracle.
+
+## Saved history
+
+Hana Furu stores today's flower and past flower results in the browser's `localStorage`. This means history stays on the same device and browser, but it is not synced anywhere. Use the **Clear history** button in the app to remove saved results.
+
+## Future improvement ideas
+
+- Add seasonal flower sets.
+- Let the selected mood gently influence the flower pool.
+- Add export/import for saved flower history.
+- Add a print-friendly omikuji card style.
