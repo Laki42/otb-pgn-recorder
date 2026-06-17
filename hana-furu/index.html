@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hana Furu</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="petals" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <main class="page-shell">
+    <header class="site-header">
+      <p class="eyebrow">花降る</p>
+      <h1>Hana Furu</h1>
+      <p>A quiet flower oracle for small days.</p>
+    </header>
+
+    <section class="oracle-card" aria-labelledby="oracle-title">
+      <div class="moon-mark" aria-hidden="true"></div>
+      <h2 id="oracle-title">Today’s flower has fallen.</h2>
+      <p class="intro">Choose the mood you brought to the garden, then let one flower drift down.</p>
+
+      <form class="mood-picker" aria-label="Choose your mood">
+        <label for="moodSelect">Mood</label>
+        <select id="moodSelect" name="mood">
+          <option value="Quiet">Quiet</option>
+          <option value="Tired">Tired</option>
+          <option value="Restless">Restless</option>
+          <option value="Hopeful">Hopeful</option>
+          <option value="Lonely">Lonely</option>
+          <option value="Annoyed">Annoyed</option>
+        </select>
+      </form>
+
+      <div class="actions" aria-label="Oracle actions">
+        <button id="drawButton" class="primary-button" type="button">Let a flower fall</button>
+        <button id="drawAgainButton" class="secondary-button" type="button">Draw again</button>
+      </div>
+
+      <article id="resultCard" class="result-card hidden" aria-live="polite"></article>
+    </section>
+
+    <section class="history-card" aria-labelledby="history-title">
+      <div class="history-heading">
+        <h2 id="history-title">Past Flowers</h2>
+        <button id="clearHistoryButton" class="text-button" type="button">Clear history</button>
+      </div>
+      <ul id="historyList" class="history-list"></ul>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
